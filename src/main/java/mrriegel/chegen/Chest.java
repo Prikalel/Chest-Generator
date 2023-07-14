@@ -7,14 +7,10 @@ import java.util.Random;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.potion.PotionType;
-import net.minecraft.potion.PotionUtils;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import com.google.common.collect.Lists;
 
@@ -41,11 +37,7 @@ public class Chest {
 		int minMeta, maxMeta, minSize, maxSize, chance;
 		List<Enchantment> enchantments;
 
-		/* Poti potion; */
-
-		public Stack(String modID, String name, int minMeta, int maxMeta, int minSize, int maxSize, int chance, List<Enchantment> enchantments// ,
-																																				// Poti
-																																				// potion
+		public Stack(String modID, String name, int minMeta, int maxMeta, int minSize, int maxSize, int chance, List<Enchantment> enchantments
 		) {
 			super();
 			this.modID = modID;
@@ -56,7 +48,6 @@ public class Chest {
 			this.maxSize = maxSize;
 			this.chance = chance;
 			this.enchantments = enchantments;
-			/* this.potion = potion; */
 		}
 
 		public static class Enchantment {
@@ -85,39 +76,6 @@ public class Chest {
 			}
 
 		}
-
-		// public static class Poti {
-		// String modID, name;
-		//
-		// public Poti(String modID, String name) {
-		// this.modID = modID;
-		// this.name = name;
-		// }
-		//
-		// public static Poti getPotion(ItemStack s) {
-		// if(!s.hasTagCompound()||!s.getTagCompound().hasKey("Potion"))
-		// return null;
-		// ResourceLocation r=new ResourceLocation(PotionUtils., resourcePathIn)
-		// return new Poti(modID, name)
-		// if (EnchantmentHelper.getEnchantments(s).entrySet().size() == 0)
-		// return null;
-		// List<Enchantment> lis = Lists.newArrayList();
-		// for (Entry<net.minecraft.enchantment.Enchantment, Integer> e :
-		// EnchantmentHelper.getEnchantments(s).entrySet()) {
-		// lis.add(new Enchantment(e.getKey().getEnchantmentID(e.getKey()),
-		// e.getValue()));
-		// }
-		//
-		// return lis;
-		// }
-		//
-		// public static ItemStack enchantItemStack(Poti e, ItemStack s) {
-		// PotionUtils.addPotionToItemStack(s,
-		// PotionType.getPotionTypeForName(e.modID + ":" + e.name));
-		// return s;
-		// }
-		//
-		// }
 
 		public static Stack getStack(ItemStack s) {
 			return new Stack(s.getItem().getRegistryName().getResourceDomain(), s.getItem().getRegistryName().getResourcePath(), s.getItemDamage(), s.getItemDamage(), s.getCount(), s.getCount(), 100, Enchantment.getEnchantments(s));
@@ -152,12 +110,16 @@ public class Chest {
 	}
 
 	public void fill(TileEntityChest tile) {
-		for (Stack s : items) {
-			int index = tile.getWorld().rand.nextInt(tile.getSizeInventory());
-			while (tile.getStackInSlot(index) != null) {
-				index = tile.getWorld().rand.nextInt(tile.getSizeInventory());
+		for (int i = 0; i < tile.getSizeInventory(); i++) {
+			ChestGenerator.logger.debug("Check for stack in " + String.valueOf(i));
+			ItemStack stack = tile.getStackInSlot(i);
+			if (stack != null && stack.isEmpty()) {
+				ChestGenerator.logger.debug("Set stack item in " + String.valueOf(i) + " tile name is " + tile.getName());
+				if (i < items.size()) {
+					ChestGenerator.logger.info("Set stack to " + items.get(i).name);
+					tile.setInventorySlotContents(i, items.get(i).getItemStack());
+				}
 			}
-			tile.setInventorySlotContents(index, s.getItemStack());
 		}
 	}
 
