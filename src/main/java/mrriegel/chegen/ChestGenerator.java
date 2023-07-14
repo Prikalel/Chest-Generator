@@ -16,9 +16,7 @@ import mrriegel.chegen.Chest.Stack;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickEmpty;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
@@ -84,7 +82,8 @@ public class ChestGenerator {
 	@SubscribeEvent
 	public void create(RightClickBlock e) throws IOException {
 		if (!e.getWorld().isRemote && e.getEntityPlayer().isSneaking() && e.getEntityPlayer().capabilities.isCreativeMode && e.getWorld().getTileEntity(e.getPos()) instanceof TileEntityChest) {
-			File f = new File(configDir, (new SimpleDateFormat("yyyy.MM.dd'_'HH:mm:ss")).format(new Date()) + ".json");
+			File f = new File(configDir, (new SimpleDateFormat("yyyy.MM.dd'_'HH-mm-ss")).format(new Date()) + ".json");
+			logger.debug("Gonna write to " + f.getAbsolutePath());
 			f.createNewFile();
 			List<Stack> stacks = Lists.newArrayList();
 			TileEntityChest tile = (TileEntityChest) e.getWorld().getTileEntity(e.getPos());
