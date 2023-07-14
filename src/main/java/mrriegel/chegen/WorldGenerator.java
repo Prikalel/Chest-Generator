@@ -15,33 +15,45 @@ public class WorldGenerator implements IWorldGenerator {
 	@Override
 	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
 		for (Chest chest : ChestGenerator.instance.chests) {
-			if (random.nextInt(600) >= chest.chance)
+			if (random.nextInt(100) >= chest.chance)
 				continue;
-			for (int i = 0; i < 10; ++i) {
-				int j = chunkX * 16 + world.rand.nextInt(6) - world.rand.nextInt(6);
-				int k = chunkZ * 16 + world.rand.nextInt(6) - world.rand.nextInt(6);
-				BlockPos blockpos = new BlockPos(j, chest.minY, k);
-				if (!chest.matchBiome(world, blockpos))
-					continue;
-				int max = Math.min(chest.maxY, 256);
-				while (true) {
-					if (blockpos.getY() < max && world.getBlockState(blockpos.down()).getMaterial().blocksMovement() && world.isAirBlock(blockpos))
-						break;
-					blockpos = blockpos.up();
-					if (blockpos.getY() > max)
-						break;
-				}
-				if (blockpos.getY() > max)
-					continue;
-				boolean foo = true;
-				for (int ii = 0; ii < 3; ii++)
-					if (!world.isAirBlock(blockpos.up(ii + 1)))
-						foo = false;
-				if (foo && generate(world, world.rand, blockpos, chest)) {
-					break;
-				}
+			if (!spawnChest(random, chunkX, chunkZ, world, chest)) {
+				ChestGenerator.logger.warn("Can not spawn chest at location X:" + String.valueOf(chunkX) + " Z: " + String.valueOf(chunkZ));
 			}
 		}
+	}
+
+	/**
+	 * Спавнит сундук в чанке.
+	 * 
+	 * @param random Рандомизация.
+	 * @param chunkX Позиция чанка.
+	 * @param chunkZ Позиция чанка.
+	 * @param world Мир.
+	 * @param chest Сундук который надо заспавнить.
+	 * @return true если получилось и false иначе.
+	 */
+	private boolean spawnChest(Random random, int chunkX, int chunkZ, World world, Chest chest) {
+		int j = chunkX * 16 + world.rand.nextInt(6) - world.rand.nextInt(6);
+		int k = chunkZ * 16 + world.rand.nextInt(6) - world.rand.nextInt(6);
+		BlockPos blockpos = new BlockPos(j, chest.minY, k);
+		if (!chest.matchBiome(world, blockpos))
+			return false;
+		int max = Math.min(chest.maxY, 256);
+		while (blockpos.getY() < max && !isPositionGood(blockpos, world)) {
+			blockpos = blockpos.up();
+		}
+		if (blockpos.getY() > max)
+			return false;
+		boolean noBlocksUp = true;
+		for (int ii = 0; ii < 3; ii++)
+			if (!world.isAirBlock(blockpos.up(ii + 1)))
+				noBlocksUp = false;
+		return noBlocksUp && generate(world, world.rand, blockpos, chest);
+	}
+
+	private boolean isPositionGood(BlockPos blockpos, World world) {
+		return world.getBlockState(blockpos.down()).getMaterial().blocksMovement() && world.isAirBlock(blockpos);
 	}
 
 	private boolean generate(World world, Random rand, BlockPos position, Chest chest) {
