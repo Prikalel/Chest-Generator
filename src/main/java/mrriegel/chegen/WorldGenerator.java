@@ -17,11 +17,16 @@ public class WorldGenerator implements IWorldGenerator {
 
 	@Override
 	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
-		for (Chest chest : ChestGenerator.instance.chests) {
+		Chest chest = ChestGenerator.instance.GetRandomChest(random);
+		if (chest != null) {
 			if (random.nextInt(100) >= chest.chance)
-				continue;
+				return;
 			if (!spawnChest(chunkX, chunkZ, world, chest)) {
 				logger.warn("Can not spawn chest at location X:" + String.valueOf(chunkX) + " Z: " + String.valueOf(chunkZ));
+			}
+		} else {
+			if (ConfigHandler.debugOutput) {
+				logger.debug("No chests in list! Nothing to spawn.");
 			}
 		}
 	}

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import mrriegel.chegen.Chest.Stack;
 import net.minecraft.tileentity.TileEntityChest;
@@ -45,8 +46,16 @@ public class ChestGenerator {
 
 	public static Logger logger;
 
-	public List<Chest> chests = Lists.newArrayList();
+	private List<Chest> chests = Lists.newArrayList();
 	public File configDir;
+
+	public Chest GetRandomChest(Random rand) {
+		if (chests.size() == 0) {
+			return null;
+		}
+		int i = rand.nextInt(chests.size());
+		return chests.get(i);
+	}
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) throws IOException {
