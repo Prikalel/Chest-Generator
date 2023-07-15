@@ -12,8 +12,13 @@ import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraftforge.fml.common.IWorldGenerator;
 import org.apache.logging.log4j.Logger;
 
+import algs.model.kdtree.TwoDTree;
+
 public class WorldGenerator implements IWorldGenerator {
 	private static Logger logger = ChestGenerator.logger;
+	private static TwoDTree tree = new TwoDTree();
+
+	private double minimalDistanceBetweenChests = 300;
 
 	@Override
 	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
@@ -43,6 +48,17 @@ public class WorldGenerator implements IWorldGenerator {
 	private boolean spawnChest(int chunkX, int chunkZ, World world, Chest chest) {
 		int j = chunkX * 16 + world.rand.nextInt(6) - world.rand.nextInt(6);
 		int k = chunkZ * 16 + world.rand.nextInt(6) - world.rand.nextInt(6);
+		ChestLocation newChestLocation = new ChestLocation(j, k);
+		if (tree.count() != 0) {
+			ChestLocation nearestChestSpawned = (ChestLocation) tree.nearest(newChestLocation);
+			if (nearestChestSpawned != null) {
+				if (nearestChestSpawned.getDistance(newChestLocation) < minimalDistanceBetweenChests) {
+					logger.warn("Will not spawn chest at location " + newChestLocation.toString());
+					return false;
+				}
+			}
+		}
+
 		BlockPos blockpos = new BlockPos(j, chest.minY, k);
 		if (!chest.matchBiome(world, blockpos))
 			return false;
@@ -56,14 +72,19 @@ public class WorldGenerator implements IWorldGenerator {
 		for (int ii = 0; ii < 3; ii++)
 			if (!world.isAirBlock(blockpos.up(ii + 1)))
 				noBlocksUp = false;
-		return noBlocksUp && generate(world, world.rand, blockpos, chest);
+		if (noBlocksUp) {
+			generate(world, world.rand, blockpos, chest);
+			tree.insert(newChestLocation);
+			return true;
+		}
+		return false;
 	}
 
 	private boolean isPositionGood(BlockPos blockpos, World world) {
 		return world.getBlockState(blockpos.down()).getMaterial().blocksMovement() && world.isAirBlock(blockpos);
 	}
 
-	private boolean generate(World world, Random rand, BlockPos position, Chest chest) {
+	private void generate(World world, Random rand, BlockPos position, Chest chest) {
 		BlockPos blockpos = new BlockPos(position);
 		world.setBlockState(blockpos, Blocks.CHEST.getStateFromMeta(rand.nextInt(6)), 2);
 		if (ConfigHandler.debugOutput)
@@ -71,7 +92,7 @@ public class WorldGenerator implements IWorldGenerator {
 		TileEntity tileentity = world.getTileEntity(blockpos);
 
 		if (tileentity instanceof TileEntityChest) {
-			chest.fill((TileEntityChest) tileentity);
+			chest.fill((TileEntityChest) tileentity, rand);
 		}
 
 		BlockPos blockpos1 = blockpos.east();
@@ -95,8 +116,6 @@ public class WorldGenerator implements IWorldGenerator {
 				world.setBlockState(blockpos4, Blocks.TORCH.getDefaultState(), 2);
 			}
 		}
-		return true;
-
 	}
 
 }

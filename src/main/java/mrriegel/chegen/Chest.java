@@ -110,7 +110,7 @@ public class Chest {
 		return biomes.contains(currentBiom);
 	}
 
-	public void fill(TileEntityChest tile) {
+	public void fill(TileEntityChest tile, Random rand) {
 		for (int i = 0; i < tile.getSizeInventory(); i++) {
 			logger.debug("Check for stack in " + String.valueOf(i));
 			ItemStack stack = tile.getStackInSlot(i);
@@ -118,11 +118,11 @@ public class Chest {
 				logger.debug("Set stack item in " + String.valueOf(i) + " tile name is " + tile.getName());
 				if (i < items.size()) {
 					logger.debug("Gonna set stack to " + items.get(i).name);
-					ItemStack item = items.get(i).getItemStack(tile.getWorld().rand);
+					ItemStack item = items.get(i).getItemStack(rand);
 					if (item != null) {
 						tile.setInventorySlotContents(i, item);
 					} else {
-						logger.debug("Will not set stack to " + items.get(i).name + " chance is bad.");
+						logger.warn("Will not set stack to " + items.get(i).name + " chance is bad.");
 					}
 				}
 			}
