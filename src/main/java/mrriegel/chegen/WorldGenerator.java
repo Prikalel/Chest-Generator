@@ -10,15 +10,18 @@ import net.minecraft.world.World;
 import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraftforge.fml.common.IWorldGenerator;
+import org.apache.logging.log4j.Logger;
 
 public class WorldGenerator implements IWorldGenerator {
+	private static Logger logger = ChestGenerator.logger;
+
 	@Override
 	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
 		for (Chest chest : ChestGenerator.instance.chests) {
 			if (random.nextInt(100) >= chest.chance)
 				continue;
-			if (!spawnChest(random, chunkX, chunkZ, world, chest)) {
-				ChestGenerator.logger.warn("Can not spawn chest at location X:" + String.valueOf(chunkX) + " Z: " + String.valueOf(chunkZ));
+			if (!spawnChest(chunkX, chunkZ, world, chest)) {
+				logger.warn("Can not spawn chest at location X:" + String.valueOf(chunkX) + " Z: " + String.valueOf(chunkZ));
 			}
 		}
 	}
@@ -26,14 +29,13 @@ public class WorldGenerator implements IWorldGenerator {
 	/**
 	 * Спавнит сундук в чанке.
 	 * 
-	 * @param random Рандомизация.
 	 * @param chunkX Позиция чанка.
 	 * @param chunkZ Позиция чанка.
 	 * @param world Мир.
 	 * @param chest Сундук который надо заспавнить.
 	 * @return true если получилось и false иначе.
 	 */
-	private boolean spawnChest(Random random, int chunkX, int chunkZ, World world, Chest chest) {
+	private boolean spawnChest(int chunkX, int chunkZ, World world, Chest chest) {
 		int j = chunkX * 16 + world.rand.nextInt(6) - world.rand.nextInt(6);
 		int k = chunkZ * 16 + world.rand.nextInt(6) - world.rand.nextInt(6);
 		BlockPos blockpos = new BlockPos(j, chest.minY, k);
@@ -60,7 +62,7 @@ public class WorldGenerator implements IWorldGenerator {
 		BlockPos blockpos = new BlockPos(position);
 		world.setBlockState(blockpos, Blocks.CHEST.getStateFromMeta(rand.nextInt(6)), 2);
 		if (ConfigHandler.debugOutput)
-			ChestGenerator.logger.info("Chest " + chest.name + " at " + blockpos);
+			logger.info("Chest " + chest.name + " at " + blockpos);
 		TileEntity tileentity = world.getTileEntity(blockpos);
 
 		if (tileentity instanceof TileEntityChest) {

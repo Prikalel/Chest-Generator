@@ -12,9 +12,12 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import org.apache.logging.log4j.Logger;
+
 import com.google.common.collect.Lists;
 
 public class Chest {
+	private static Logger logger = ChestGenerator.logger;
 
 	List<Stack> items;
 	List<String> biomes;
@@ -81,11 +84,9 @@ public class Chest {
 			return new Stack(s.getItem().getRegistryName().getResourceDomain(), s.getItem().getRegistryName().getResourcePath(), s.getItemDamage(), s.getItemDamage(), s.getCount(), s.getCount(), 100, Enchantment.getEnchantments(s));
 		}
 
-		public ItemStack getItemStack() {
-			Random rand = new Random();
+		public ItemStack getItemStack(Random rand) {
 			if (rand.nextInt(100) >= chance)
 				return null;
-			// Item i = GameRegistry.findItem(modID, name);
 			Item i = Item.REGISTRY.getObject(new ResourceLocation(modID, name));
 			ItemStack res = null;
 			if (i != null) {
@@ -111,13 +112,18 @@ public class Chest {
 
 	public void fill(TileEntityChest tile) {
 		for (int i = 0; i < tile.getSizeInventory(); i++) {
-			ChestGenerator.logger.debug("Check for stack in " + String.valueOf(i));
+			logger.debug("Check for stack in " + String.valueOf(i));
 			ItemStack stack = tile.getStackInSlot(i);
 			if (stack != null && stack.isEmpty()) {
-				ChestGenerator.logger.debug("Set stack item in " + String.valueOf(i) + " tile name is " + tile.getName());
+				logger.debug("Set stack item in " + String.valueOf(i) + " tile name is " + tile.getName());
 				if (i < items.size()) {
-					ChestGenerator.logger.info("Set stack to " + items.get(i).name);
-					tile.setInventorySlotContents(i, items.get(i).getItemStack());
+					logger.debug("Gonna set stack to " + items.get(i).name);
+					ItemStack item = items.get(i).getItemStack(tile.getWorld().rand);
+					if (item != null) {
+						tile.setInventorySlotContents(i, item);
+					} else {
+						logger.debug("Will not set stack to " + items.get(i).name + " chance is bad.");
+					}
 				}
 			}
 		}
