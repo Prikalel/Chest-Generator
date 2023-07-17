@@ -18,7 +18,7 @@ public class WorldGenerator implements IWorldGenerator {
 	private static Logger logger = ChestGenerator.logger;
 	private static TwoDTree tree = new TwoDTree();
 
-	private double minimalDistanceBetweenChests = 300;
+	private double minimalDistanceBetweenChests = ConfigHandler.minimalDistanceBetweenChests;
 
 	@Override
 	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
