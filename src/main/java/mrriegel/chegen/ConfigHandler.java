@@ -26,13 +26,17 @@ public class ConfigHandler {
 	public static void refreshConfig(File file) {
 		config = new Configuration(file);
 		config.load();
-		String mainConfigFileName = "debugOutput";
+		// TODO: refactor and make clearer.
 
-		debugOutput = config.get(Configuration.CATEGORY_GENERAL, mainConfigFileName, false).getBoolean();
+		debugOutput = config.get(Configuration.CATEGORY_GENERAL, "debugOutput", false).getBoolean();
+		config.get(Configuration.CATEGORY_GENERAL, "debugOutput", false).setComment("Enable debug output. (not used actually)");
 
-		minimalDistanceBetweenChests = config.get(Configuration.CATEGORY_GENERAL, mainConfigFileName, 300.0).getDouble();
+		minimalDistanceBetweenChests = config.get(Configuration.CATEGORY_GENERAL, "minimalDistanceBetweenChests", 300.0).getDouble();
+		config.get(Configuration.CATEGORY_GENERAL, "minimalDistanceBetweenChests", 300.0).setComment("Minimal allowed distance (in horizontal) between two spawned chests.");
 
-		chestDefaultSpawnChance =  config.get(Configuration.CATEGORY_GENERAL, mainConfigFileName, 10).getInt();
+		chestDefaultSpawnChance = config.get(Configuration.CATEGORY_GENERAL, "chestDefaultSpawnChance", 10).getInt();
+		config.get(Configuration.CATEGORY_GENERAL, "chestDefaultSpawnChance", 10).setComment("Default spawn chance for new created chest json configuration. Values are from range [0; 100].");
+
 
 		if (config.hasChanged()) {
 			config.save();
