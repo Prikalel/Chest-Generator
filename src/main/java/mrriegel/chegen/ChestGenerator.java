@@ -99,8 +99,8 @@ public class ChestGenerator {
 			for (int i = 0; i < tile.getSizeInventory(); i++)
 				if (tile.getStackInSlot(i) != null)
 					stacks.add(Stack.getStack(tile.getStackInSlot(i)));
-			String biom = e.getWorld().provider.getDimensionType().toString().toLowerCase();
-			Chest c = new Chest(stacks, Arrays.asList(biom), true, 10, 1, 256, f.getName().replaceAll(".json", ""));
+			String biomName = BiomeInfo.getBiomeName(e.getWorld(), e.getPos());
+			Chest c = new Chest(stacks, Arrays.asList(biomName), true, ConfigHandler.chestDefaultSpawnChance, 1, 256, f.getName().replaceAll(".json", ""));
 			FileWriter fw = new FileWriter(f);
 			fw.write(new GsonBuilder().setPrettyPrinting().create().toJson(c));
 			fw.close();

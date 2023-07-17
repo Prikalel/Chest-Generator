@@ -106,8 +106,8 @@ public class Chest {
 			return true;
 		if (biomes.contains(world.provider.getDimensionType().toString().toLowerCase()))
 			return true;
-		String currentBiom = world.getChunkFromBlockCoords(pos).getBiome(pos, world.getBiomeProvider()).getBiomeName();
-		return biomes.contains(currentBiom);
+		String currentBiomeName = BiomeInfo.getBiomeName(world, pos);
+		return biomes.contains(currentBiomeName);
 	}
 
 	public void fill(TileEntityChest tile, Random rand) {
