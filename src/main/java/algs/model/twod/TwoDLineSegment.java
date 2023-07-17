@@ -53,8 +53,6 @@ public class TwoDLineSegment implements ILineSegment, IMultiLineSegment {
 	 * 
 	 * @param s   Start of this line segment in two-dimensional space
 	 * @param e   End of this line segment in two-dimensional space
-	 * 
-	 * TODO: Should we prevent attempts to store with Infinity?
 	 */
 	public TwoDLineSegment (IPoint s, IPoint e) {
 		TwoDPoint st = new TwoDPoint (s);
