@@ -96,9 +96,11 @@ public class ChestGenerator {
 			f.createNewFile();
 			List<Stack> stacks = Lists.newArrayList();
 			TileEntityChest tile = (TileEntityChest) e.getWorld().getTileEntity(e.getPos());
-			for (int i = 0; i < tile.getSizeInventory(); i++)
-				if (tile.getStackInSlot(i) != null)
+			for (int i = 0; i < tile.getSizeInventory(); i++) {
+				if (tile.getStackInSlot(i) != null && !Stack.isAir(tile.getStackInSlot(i)) && tile.getStackInSlot(i).getCount() > 0) {
 					stacks.add(Stack.getStack(tile.getStackInSlot(i)));
+				}
+			}
 			String biomName = BiomeInfo.getBiomeName(e.getWorld(), e.getPos());
 			Chest c = new Chest(stacks, Arrays.asList(biomName), true, ConfigHandler.chestDefaultSpawnChance, 1, 256, f.getName().replaceAll(".json", ""));
 			FileWriter fw = new FileWriter(f);

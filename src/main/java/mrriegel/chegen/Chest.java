@@ -80,6 +80,13 @@ public class Chest {
 
 		}
 
+		public static boolean isAir(ItemStack s) {
+			String domain = s.getItem().getRegistryName().getResourceDomain();
+			String id = s.getItem().getRegistryName().getResourcePath();
+			ChestGenerator.logger.debug("Found stack " + domain + ":" + id);
+			return domain == "minecraft" && id == "air";
+		}
+
 		public static Stack getStack(ItemStack s) {
 			return new Stack(s.getItem().getRegistryName().getResourceDomain(), s.getItem().getRegistryName().getResourcePath(), s.getItemDamage(), s.getItemDamage(), s.getCount(), s.getCount(), 100, Enchantment.getEnchantments(s));
 		}
