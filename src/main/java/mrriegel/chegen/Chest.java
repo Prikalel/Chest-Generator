@@ -33,6 +33,9 @@ public class Chest {
 		this.minY = minY;
 		this.maxY = maxY;
 		this.name = name;
+		if (minY >= maxY) {
+			logger.error("Check settings for chest: minimal value must be less than max. minY=" + String.valueOf(minY) + ", maxY=" + String.valueOf(maxY));
+		}
 	}
 
 	public static class Stack {
