@@ -30,9 +30,7 @@ public class WorldGenerator implements IWorldGenerator {
 				logger.warn("Can not spawn chest at location X:" + String.valueOf(chunkX) + " Z: " + String.valueOf(chunkZ));
 			}
 		} else {
-			if (ConfigHandler.debugOutput) {
-				logger.debug("No chests in list! Nothing to spawn.");
-			}
+			logger.debug("No chests in list! Nothing to spawn.");
 		}
 	}
 
@@ -87,8 +85,7 @@ public class WorldGenerator implements IWorldGenerator {
 	private void generate(World world, Random rand, BlockPos position, Chest chest) {
 		BlockPos blockpos = new BlockPos(position);
 		world.setBlockState(blockpos, Blocks.CHEST.getStateFromMeta(rand.nextInt(6)), 2);
-		if (ConfigHandler.debugOutput)
-			logger.info("Chest " + chest.name + " at " + blockpos);
+		logger.info("Chest " + chest.name + " at " + blockpos);
 		TileEntity tileentity = world.getTileEntity(blockpos);
 
 		if (tileentity instanceof TileEntityChest) {
